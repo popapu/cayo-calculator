@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-LRPXNLC1Y4"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-LRPXNLC1Y4');
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>카요 페리코 수익 계산기</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'gta-dark': '#1a1a2e',
+            'gta-purple': '#4a1942',
+            'gta-gold': '#eab308',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+    .calc-section {
+      background-color: #111827;
+      border: 1px solid #374151;
+      border-radius: 0.5rem;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .calc-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #eab308;
+      margin-bottom: 1.25rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid #374151;
+    }
+    .form-select {
+      width: 100%;
+      padding: 0.5rem 0.75rem;
+      background-color: #1f2937;
+      border: 1px solid #4b5563;
+      border-radius: 0.375rem;
+      color: #f3f4f6;
+    }
+    .form-select:focus { outline: none; border-color: #eab308; }
+    .form-input {
+      padding: 0.375rem 0.5rem;
+      background-color: #1f2937;
+      border: 1px solid #4b5563;
+      border-radius: 0.375rem;
+      color: #f3f4f6;
+    }
+    .form-input:focus { outline: none; border-color: #eab308; box-shadow: 0 0 0 1px #eab308; }
+    .radio-group { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+    .radio-option {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1.25rem;
+      background-color: #1f2937;
+      border: 1px solid #4b5563;
+      border-radius: 0.375rem;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .radio-option:hover { border-color: #6b7280; }
+    .radio-option:has(input:checked) { border-color: #eab308; background-color: #374151; }
+    .radio-option input[type="radio"] { accent-color: #eab308; }
+    .loot-row { display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem 0; }
+    .loot-label { font-size: 0.875rem; color: #d1d5db; width: 5rem; flex-shrink: 0; }
+    .loot-hint { font-size: 0.75rem; color: #6b7280; flex: 1; }
+    .loot-btn {
+      width: 1.75rem; height: 1.75rem;
+      display: flex; align-items: center; justify-content: center;
+      background: #1f2937; border: 1px solid #4b5563; border-radius: 0.25rem;
+      color: #d1d5db; cursor: pointer; font-size: 1rem; line-height: 1;
+      transition: border-color 0.1s;
+    }
+    .loot-btn:hover { border-color: #eab308; color: #eab308; }
+    .loot-btn:disabled { opacity: 0.3; cursor: default; }
+    .loot-count { width: 1.75rem; text-align: center; font-size: 0.875rem; font-weight: 600; color: #f3f4f6; }
+    .result-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+    .result-table th {
+      text-align: left; color: #6b7280; font-weight: 500;
+      padding: 0.375rem 0.5rem; border-bottom: 1px solid #374151;
+    }
+    .result-table td { padding: 0.375rem 0.5rem; color: #d1d5db; }
+    .result-table tr.skipped td { color: #4b5563; }
+    .bag-bar-wrap {
+      background: #1f2937; border-radius: 0.375rem;
+      overflow: hidden; height: 0.75rem; margin: 0.375rem 0;
+    }
+    .bag-bar-fill { height: 100%; background: #eab308; transition: width 0.3s ease; }
+    .bag-bar-fill.full { background: #22c55e; }
+    .payout-row {
+      display: flex; justify-content: space-between; align-items: baseline;
+      padding: 0.25rem 0; font-size: 0.875rem;
+    }
+    .payout-row .label { color: #9ca3af; }
+    .payout-row .value { color: #f3f4f6; font-weight: 500; }
+    .payout-row .value.gold { color: #eab308; }
+    .two-col-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+      align-items: start;
+    }
+    .two-col-row .loot-label { width: 3.5rem; font-size: 0.8125rem; }
+    .two-col-row .loot-btn { width: 1.5rem; height: 1.5rem; font-size: 0.875rem; }
+    .two-col-row .loot-count { width: 1.5rem; font-size: 0.8125rem; }
+    .two-col-row .loot-hint { display: none; }
+    .two-col-row .radio-option { padding: 0.5rem 0.625rem; font-size: 0.875rem; }
+    .cut-input { width: 5rem; }
+    .two-col-row .cut-input { width: 3rem; font-size: 0.8125rem; padding: 0.25rem 0.375rem; }
+    .two-col-row .cut-label { width: 2.75rem; }
+    .two-col-row .cut-pct { display: none; }
+    @media (max-width: 380px) {
+      .two-col-row { grid-template-columns: 1fr; }
+      .two-col-row .loot-label { width: 5rem; font-size: 0.875rem; }
+      .two-col-row .loot-btn { width: 1.75rem; height: 1.75rem; font-size: 1rem; }
+      .two-col-row .loot-count { width: 1.75rem; font-size: 0.875rem; }
+      .two-col-row .loot-hint { display: inline; }
+      .two-col-row .radio-option { padding: 0.5rem 1.25rem; }
+      .two-col-row .cut-input { width: 5rem; font-size: inherit; padding: 0.375rem 0.5rem; }
+      .two-col-row .cut-label { width: 3.5rem; }
+      .two-col-row .cut-pct { display: inline; }
+    }
+    .player-payout-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid #1f2937;
+    }
+    .player-payout-row:last-child { border-bottom: none; }
+    .radio-difficulty-normal:has(input:checked) { border-color: #CC5500; background-color: #1A0A00; color: #FF8C00; }
+    .radio-difficulty-hard:has(input:checked)   { border-color: #AA0000; background-color: #1A0000; color: #FF3333; }
+  </style>
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen">
+
+  <header class="bg-gta-dark border-b border-gray-700 sticky top-0 z-40">
+    <div class="max-w-5xl mx-auto px-3 sm:px-4 py-3 sm:py-4">
+      <div class="flex items-center justify-between">
+        <span class="text-lg sm:text-xl font-bold text-gta-gold">카요 페리코 계산기</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-5xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
+    <div class="max-w-2xl mx-auto">
+
+      <div style="margin-bottom:1.5rem;">
+        <h1 class="text-2xl font-bold text-white mb-1">수익 계산기</h1>
+        <p class="text-gray-400 text-sm">카요 페리코 습격 예상 수익을 계산하세요</p>
+      </div>
+
+      <!-- 습격 조건 설정 -->
+      <div class="calc-section">
+        <h2 class="calc-title">습격 조건 설정</h2>
+
+        <div style="margin-bottom:1.25rem;">
+          <label class="block text-sm font-medium text-gray-300 mb-2">주요 목표물</label>
+          <select id="calc-primary" class="form-select">
+            <option value="pink_diamond" selected>핑크 다이아몬드</option>
+            <option value="bearer_bonds">무기명 채권</option>
+            <option value="ruby_necklace">루비 목걸이</option>
+            <option value="tequila">신시미토 테킬라</option>
+            <option value="panther">팬서 조각상 (이벤트 한정)</option>
+            <option value="madrazo_file">마드라조 파일 (초회차 한정)</option>
+          </select>
+          <p id="primary-value-hint" style="font-size:0.75rem; color:#6b7280; margin-top:0.375rem;"></p>
+        </div>
+
+        <!-- Row 1: Difficulty + Crew -->
+        <div class="two-col-row">
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2">난이도</label>
+            <div class="radio-group">
+              <label class="radio-option radio-difficulty-normal"><input type="radio" name="calc-difficulty" value="normal" checked><span>보통</span></label>
+              <label class="radio-option radio-difficulty-hard"><input type="radio" name="calc-difficulty" value="hard"><span>어려움</span></label>
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2">인원</label>
+            <div class="radio-group">
+              <label class="radio-option"><input type="radio" name="calc-crew" value="1"><span>1인</span></label>
+              <label class="radio-option"><input type="radio" name="calc-crew" value="2" checked><span>2인</span></label>
+              <label class="radio-option"><input type="radio" name="calc-crew" value="3"><span>3인</span></label>
+              <label class="radio-option"><input type="radio" name="calc-crew" value="4"><span>4인</span></label>
+            </div>
+            <div id="calc-solo-note" style="display:none; margin-top:0.375rem; padding:0.375rem 0.625rem; background:#1c1917; border:1px solid #78716c; border-radius:0.375rem; font-size:0.75rem; color:#ff6600;">
+              솔로 진행시 금 획득이 불가능하고,<br>
+              쿨타임이 48분이 아닌 2시간 24분이 됩니다.
+            </div>
+          </div>
+        </div>
+
+        <!-- Row 2: Secondary loot + Profit split -->
+        <div class="two-col-row" style="margin-bottom:0.75rem;">
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2">보조 목표물
+              <span style="color:#6b7280; font-weight:normal; font-size:0.75rem;">(갯수)</span>
+            </label>
+            <div id="calc-loot-widget">
+              <div class="loot-row">
+                <span class="loot-label">금괴</span>
+                <button type="button" class="loot-btn" data-loot="금" data-dir="-1">−</button>
+                <span class="loot-count" id="calc-loot-금-count">0</span>
+                <button type="button" class="loot-btn" data-loot="금" data-dir="1">＋</button>
+                <span class="loot-hint" id="calc-hint-금"></span>
+              </div>
+              <div class="loot-row">
+                <span class="loot-label">코카인</span>
+                <button type="button" class="loot-btn" data-loot="코카인" data-dir="-1">−</button>
+                <span class="loot-count" id="calc-loot-코카인-count">0</span>
+                <button type="button" class="loot-btn" data-loot="코카인" data-dir="1">＋</button>
+                <span class="loot-hint" id="calc-hint-코카인"></span>
+              </div>
+              <div class="loot-row">
+                <span class="loot-label">마리화나</span>
+                <button type="button" class="loot-btn" data-loot="마리화나" data-dir="-1">−</button>
+                <span class="loot-count" id="calc-loot-마리화나-count">0</span>
+                <button type="button" class="loot-btn" data-loot="마리화나" data-dir="1">＋</button>
+                <span class="loot-hint" id="calc-hint-마리화나"></span>
+              </div>
+              <div class="loot-row">
+                <span class="loot-label">그림</span>
+                <button type="button" class="loot-btn" data-loot="그림" data-dir="-1">−</button>
+                <span class="loot-count" id="calc-loot-그림-count">0</span>
+                <button type="button" class="loot-btn" data-loot="그림" data-dir="1">＋</button>
+                <span class="loot-hint" id="calc-hint-그림"></span>
+              </div>
+              <div class="loot-row">
+                <span class="loot-label">현금</span>
+                <button type="button" class="loot-btn" data-loot="현금" data-dir="-1">−</button>
+                <span class="loot-count" id="calc-loot-현금-count">0</span>
+                <button type="button" class="loot-btn" data-loot="현금" data-dir="1">＋</button>
+                <span class="loot-hint" id="calc-hint-현금"></span>
+              </div>
+            </div>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-gray-300 mb-1">수익 분배</p>
+            <p style="color:#6b7280; font-size:0.75rem; margin-bottom:0.5rem;">5% 단위 · 최소 15% · 합계 100%</p>
+            <div id="calc-cut-widget" class="space-y-2 mb-2"></div>
+            <div style="display:flex; align-items:center; gap:0.5rem; padding-top:0.5rem; border-top:1px solid #374151;">
+              <span class="text-sm text-gray-400">합계:</span>
+              <span id="calc-cut-total" class="font-semibold text-sm text-green-400">100%</span>
+              <span id="calc-cut-status" class="text-xs text-green-400">✓</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Full Bag Possible indicator -->
+        <div id="bag-full-indicator" style="display:none; margin-bottom:0.75rem; padding:0.5rem 0.75rem; border-radius:0.375rem; font-size:0.875rem; border:1px solid;">
+          가방 가득 채우기: <strong id="bag-full-yn"></strong>
+        </div>
+
+        <!-- Player payout -->
+        <div style="border-top:1px solid #374151; padding-top:1rem;">
+          <p class="text-xs text-gray-500 mb-2">
+            플레이어별 예상 수익
+            <span style="color:#4b5563;">· 기본 / 엘리트 포함</span>
+          </p>
+          <div id="calc-player-panel">
+            <p class="text-xs text-gray-600">주요 목표물을 선택하면 표시됩니다</p>
+          </div>
+          <div id="calc-elite-row" class="hidden" style="margin-top:0.5rem; padding-top:0.5rem; border-top:1px solid #1f2937;">
+            <div style="display:flex; justify-content:space-between;" class="text-xs">
+              <span class="text-gray-500">엘리트 보상 (1인당)</span>
+              <span id="calc-elite-val" class="text-yellow-600"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 상세 정보 (collapsible) -->
+      <div class="calc-section" style="padding:0; overflow:hidden;">
+        <button type="button" id="detail-toggle"
+                class="w-full text-left" style="padding:1.25rem 1.5rem; cursor:pointer; background:transparent; border:none;">
+          <div style="display:flex; align-items:center; justify-content:space-between;">
+            <span style="font-size:1rem; font-weight:600; color:#eab308;">상세 정보</span>
+            <svg id="detail-icon" class="w-5 h-5 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </div>
+        </button>
+
+        <div id="detail-body" class="hidden" style="padding:0 1.5rem 1.5rem; border-top:1px solid #374151;">
+
+          <!-- 가방 채우기 분석 -->
+          <div style="padding-top:1.25rem; margin-bottom:1.5rem;">
+            <p class="text-sm font-medium text-gray-300 mb-2">가방 채우기 분석</p>
+            <div id="bag-placeholder" class="text-xs text-gray-600">조건을 입력하면 표시됩니다</div>
+            <div id="bag-order-note" class="hidden" style="margin-bottom:0.75rem; padding:0.5rem 0.75rem; background:#1c1917; border:1px solid #44403c; border-radius:0.375rem; font-size:0.75rem; color:#d6d3d1;">
+              그림을 먼저 수집한 후, 나머지 공간을 다른 목표물로 채우세요
+            </div>
+            <table class="result-table hidden" id="bag-table">
+              <thead>
+                <tr>
+                  <th>목표물</th>
+                  <th style="text-align:right;">보유 갯수</th>
+                  <th style="text-align:right;">수집 방법</th>
+                  <th style="text-align:right;">예상 수익</th>
+                </tr>
+              </thead>
+              <tbody id="bag-tbody"></tbody>
+            </table>
+            <div id="bag-bar-wrap-outer" class="hidden" style="margin-top:0.75rem;">
+              <div style="display:flex; justify-content:space-between; font-size:0.75rem; margin-bottom:0.25rem;">
+                <span class="text-gray-400">가방 용량</span>
+                <span id="bag-fill-label" class="text-gray-300"></span>
+              </div>
+              <div class="bag-bar-wrap">
+                <div class="bag-bar-fill" id="bag-bar" style="width:0%"></div>
+              </div>
+              <p id="bag-status-msg" class="text-xs mt-1"></p>
+            </div>
+          </div>
+
+          <!-- 플레이어별 수거 계획 -->
+          <div style="margin-bottom:1.5rem;">
+            <p id="player-tasks-title" class="text-sm font-medium text-gray-300 mb-2">플레이어별 수거 계획</p>
+            <div id="player-tasks-content">
+              <p class="text-xs text-gray-600">조건을 입력하면 표시됩니다</p>
+            </div>
+          </div>
+
+          <!-- 수익 요약 -->
+          <div>
+            <p class="text-sm font-medium text-gray-300 mb-2">수익 요약</p>
+            <div id="payout-summary">
+              <p class="text-xs text-gray-600">주요 목표물을 선택하면 표시됩니다</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="border-t border-gray-700 mt-8 sm:mt-12">
+    <div class="max-w-5xl mx-auto px-4 py-4 sm:py-6 text-center text-gray-500 text-xs sm:text-sm">
+      GTA 온라인 카요 페리코 습격 수익 계산기
+    </div>
+  </footer>
+
+  <script>
+    // ── Inlined data (no Django backend needed) ───────────────────────────────
+    const LOOT_ITEMS = [
+      {"key":"금",      "label":"금괴",    "avg_value":330833, "units_per_table":1200, "max_clicks":7,  "pickup_units":[100,300,400,600,800,1000,1200]},
+      {"key":"코카인",  "label":"코카인",  "avg_value":200250, "units_per_table":900,  "max_clicks":10, "pickup_units":[100,200,280,340,380,460,580,700,860,900]},
+      {"key":"마리화나","label":"마리화나","avg_value":132750, "units_per_table":675,  "max_clicks":10, "pickup_units":[75,150,210,255,285,345,435,525,645,675]},
+      {"key":"그림",    "label":"그림",    "avg_value":168750, "units_per_table":900,  "max_clicks":1,  "pickup_units":[900]},
+      {"key":"현금",    "label":"현금",    "avg_value":81000,  "units_per_table":450,  "max_clicks":10, "pickup_units":[50,100,140,170,190,230,290,350,430,450]}
+    ];
+
+    const PRIMARY_TARGETS = [
+      {"key":"pink_diamond",  "label":"핑크 다이아몬드",              "bonus_multiplier":1.00, "standard":1300000, "hard":1430000},
+      {"key":"bearer_bonds",  "label":"무기명 채권",                  "bonus_multiplier":1.05, "standard":770000,  "hard":850000},
+      {"key":"ruby_necklace", "label":"루비 목걸이",                  "bonus_multiplier":1.10, "standard":700000,  "hard":770000},
+      {"key":"tequila",       "label":"신시미토 테킬라",              "bonus_multiplier":1.20, "standard":630000,  "hard":690000},
+      {"key":"panther",       "label":"팬서 조각상 (이벤트 한정)",    "bonus_multiplier":1.00, "standard":1900000, "hard":2090000},
+      {"key":"madrazo_file",  "label":"마드라조 파일 (초회차 한정)",  "bonus_multiplier":1.00, "standard":1100000, "hard":1100000}
+    ];
+
+    // ── Constants ─────────────────────────────────────────────────────────────
+    const LOOT_KEYS   = LOOT_ITEMS.map(l => l.key);
+    const LOOT_MAP    = Object.fromEntries(LOOT_ITEMS.map(l => [l.key, l]));
+    const PRIMARY_MAP = Object.fromEntries(PRIMARY_TARGETS.map(t => [t.key, t]));
+
+    const BAG_CAP     = 1800;
+    const FENCING     = 0.10;
+    const PAVEL       = 0.02;
+    const OFFICE_SAFE = 59500;
+
+    function fmtMoney(n) { return '$' + Math.round(n).toLocaleString(); }
+
+    // ── Player task display mode ──────────────────────────────────────────────
+    // 'A' : 팀 전체 클릭 합산 표시
+    // 'B' : 개인별 테이블 단위 표시
+    // 'C' : 개인별 클릭 수 표시 + 근사치 경고 (현재 방식)
+    const CLICK_DISPLAY_MODE = 'C';
+
+    // ── Loot counters ─────────────────────────────────────────────────────────
+    const lootCounts = Object.fromEntries(LOOT_KEYS.map(k => [k, 0]));
+
+    function refreshLootBtn(key) {
+      const count = lootCounts[key];
+      document.getElementById(`calc-loot-${key}-count`).textContent = count;
+      document.querySelector(`#calc-loot-widget [data-loot="${key}"][data-dir="-1"]`).disabled = count <= 0;
+    }
+
+    function updateLootHints() {
+      const pKey = document.getElementById('calc-primary').value;
+      const mult = pKey && PRIMARY_MAP[pKey] ? PRIMARY_MAP[pKey].bonus_multiplier : 1.0;
+      LOOT_KEYS.forEach(key => {
+        const loot = LOOT_MAP[key];
+        const effective = Math.round(loot.avg_value * mult);
+        const el = document.getElementById(`calc-hint-${key}`);
+        if (!el) return;
+        if (mult !== 1.0) {
+          el.textContent = `$${effective.toLocaleString()}/테이블 (×${mult}) · ${loot.units_per_table}유닛`;
+          el.style.color = '#86efac';
+        } else {
+          el.textContent = `$${effective.toLocaleString()}/테이블 · ${loot.units_per_table}유닛`;
+          el.style.color = '';
+        }
+      });
+    }
+
+    document.querySelectorAll('#calc-loot-widget .loot-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const key = btn.dataset.loot;
+        const next = lootCounts[key] + parseInt(btn.dataset.dir);
+        if (next < 0) return;
+        lootCounts[key] = next;
+        refreshLootBtn(key);
+        recalcAll();
+      });
+    });
+
+    // ── Cut widget ────────────────────────────────────────────────────────────
+    const PLAYER_LABELS = ['호스트', '게스트1', '게스트2', '게스트3'];
+
+    function getDefaultCuts(crewSize) {
+      if (crewSize === 1) return [100];
+      if (crewSize === 2) return [80, 20];
+      if (crewSize === 3) return [70, 15, 15];
+      return [55, 15, 15, 15];
+    }
+
+    let cutValues = getDefaultCuts(2);
+
+    function renderCutWidget() {
+      const container = document.getElementById('calc-cut-widget');
+      container.innerHTML = '';
+      cutValues.forEach((val, i) => {
+        const row = document.createElement('div');
+        row.className = 'flex items-center gap-3';
+        row.innerHTML =
+          `<span class="text-sm text-gray-400 w-16 shrink-0 cut-label">${PLAYER_LABELS[i]}</span>` +
+          `<input type="number" class="form-input cut-input" ` +
+                 `value="${val}" min="15" max="100" step="5" data-idx="${i}">` +
+          `<span class="text-sm text-gray-500 cut-pct">%</span>`;
+        container.appendChild(row);
+      });
+      container.querySelectorAll('input').forEach(inp => inp.addEventListener('change', onCutChange));
+      updateCutTotal();
+    }
+
+    function snap5(n) { return Math.round(n / 5) * 5; }
+
+    function onCutChange(e) {
+      const idx = parseInt(e.target.dataset.idx);
+      let val = snap5(parseInt(e.target.value) || 15);
+      if (val < 15) val = 15;
+      const othersSum = cutValues.reduce((s, v, i) => i !== idx ? s + v : s, 0);
+      const maxVal = snap5(100 - othersSum);
+      if (val > maxVal) val = maxVal < 15 ? 15 : maxVal;
+      cutValues[idx] = val;
+      e.target.value = val;
+      updateCutTotal();
+      recalcAll();
+    }
+
+    function updateCutTotal() {
+      const total = cutValues.reduce((s, v) => s + v, 0);
+      const totalEl  = document.getElementById('calc-cut-total');
+      const statusEl = document.getElementById('calc-cut-status');
+      totalEl.textContent = `${total}%`;
+      if (total === 100) {
+        totalEl.className = 'font-semibold text-sm text-green-400';
+        statusEl.textContent = '✓'; statusEl.className = 'text-xs text-green-400';
+      } else {
+        const diff = 100 - total;
+        totalEl.className = 'font-semibold text-sm text-yellow-400';
+        statusEl.textContent = diff > 0 ? `${diff}% 부족` : `${-diff}% 초과`;
+        statusEl.className = 'text-xs text-yellow-400';
+      }
+    }
+
+    document.querySelectorAll('input[name="calc-crew"]').forEach(r => r.addEventListener('change', () => {
+      const crew = parseInt(document.querySelector('input[name="calc-crew"]:checked').value);
+      cutValues = getDefaultCuts(crew);
+      renderCutWidget();
+      document.getElementById('calc-solo-note').style.display = crew === 1 ? '' : 'none';
+      recalcAll();
+    }));
+
+    // ── Optimal bag enumeration ───────────────────────────────────────────────
+    function calcOptimalBag(crew, bonusMult, eliteBonus, countsOverride) {
+      const counts   = countsOverride || lootCounts;
+      const capacity = crew * BAG_CAP;
+
+      const indivisKey    = LOOT_KEYS.find(k => LOOT_MAP[k].max_clicks === 1) || null;
+      const indivisLoot   = indivisKey ? LOOT_MAP[indivisKey] : null;
+      const indivisAvail  = indivisKey ? (counts[indivisKey] || 0) : 0;
+      const indivisUnits  = indivisLoot ? indivisLoot.units_per_table : 0;
+      const indivisAvgVal = indivisLoot ? indivisLoot.avg_value : 0;
+
+      const divisible = LOOT_KEYS
+        .filter(k => k !== indivisKey && (counts[k] || 0) > 0)
+        .map(k => {
+          const loot = LOOT_MAP[k];
+          return { key: k, tables: counts[k], avg_value: loot.avg_value,
+                   units_per_table: loot.units_per_table,
+                   vpcu: (loot.avg_value * bonusMult) / loot.units_per_table };
+        })
+        .sort((a, b) => b.vpcu - a.vpcu);
+
+      function fillDiv(availCap) {
+        let remaining = availCap;
+        const items = []; let totalVal = 0;
+        for (const d of divisible) {
+          const available = d.tables * d.units_per_table;
+          if (remaining <= 0) {
+            items.push({ key: d.key, tables: d.tables, units_available: available,
+                         units_taken: 0, value: 0, skipped: true, profit_excluded: false });
+            continue;
+          }
+          const taken = Math.min(available, remaining);
+          const value = (taken / d.units_per_table) * d.avg_value * bonusMult;
+          items.push({ key: d.key, tables: d.tables, units_available: available,
+                       units_taken: taken, value, skipped: false, profit_excluded: false });
+          remaining -= taken; totalVal += value;
+        }
+        return { items, totalVal, totalTaken: availCap - remaining };
+      }
+
+      const maxK = indivisUnits > 0 ? Math.min(indivisAvail, Math.floor(capacity / indivisUnits)) : 0;
+      let bestEffective = -1, bestState = null, bestWithPaintingsSecondary = null;
+
+      for (let k = 0; k <= maxK; k++) {
+        const pUsed  = k * indivisUnits;
+        const pValue = k > 0 ? k * indivisAvgVal * bonusMult : 0;
+        const { items: divItems, totalVal: divVal, totalTaken: divTaken } = fillDiv(capacity - pUsed);
+        const totalTaken = pUsed + divTaken;
+        const isFull     = totalTaken >= capacity;
+        const secondary  = pValue + divVal;
+        const effective  = secondary + (isFull ? eliteBonus : 0);
+        if (k > 0 && (bestWithPaintingsSecondary === null || secondary > bestWithPaintingsSecondary)) {
+          bestWithPaintingsSecondary = secondary;
+        }
+        if (effective > bestEffective) {
+          bestEffective = effective;
+          bestState = { k, pValue, divItems, totalTaken, isFull, secondary };
+        }
+      }
+
+      const { k, pValue, divItems, totalTaken, isFull, secondary } = bestState;
+      const items = [];
+
+      if (indivisKey && indivisAvail > 0) {
+        items.push({
+          key:             indivisKey,
+          label:           LOOT_MAP[indivisKey].label,
+          tables:          indivisAvail,
+          units_available: indivisAvail * indivisUnits,
+          units_taken:     k * indivisUnits,
+          value:           pValue,
+          skipped:         false,
+          profit_excluded: k === 0,
+        });
+      }
+      for (const item of divItems) {
+        items.push({ ...item, label: LOOT_MAP[item.key].label });
+      }
+
+      return { items, totalTaken, capacity, isFull, totalValue: secondary, bestWithPaintingsSecondary };
+    }
+
+    function calcAll() {
+      const primaryKey = document.getElementById('calc-primary').value;
+      if (!primaryKey || !PRIMARY_MAP[primaryKey]) return null;
+
+      const difficulty = document.querySelector('input[name="calc-difficulty"]:checked')?.value || 'normal';
+      const crew       = parseInt(document.querySelector('input[name="calc-crew"]:checked')?.value || '2');
+      const pInfo      = PRIMARY_MAP[primaryKey];
+
+      const primaryVal = difficulty === 'hard' ? pInfo.hard : pInfo.standard;
+      const bonusMult  = pInfo.bonus_multiplier;
+      const eliteBonus = difficulty === 'hard' ? 100000 : 50000;
+
+      // 솔로: 금 획득 불가
+      const effectiveCounts = crew === 1 ? { ...lootCounts, '금': 0 } : lootCounts;
+      const bag          = calcOptimalBag(crew, bonusMult, eliteBonus, effectiveCounts);
+      const secondaryVal = bag.totalValue;
+      const gross        = primaryVal + secondaryVal;
+      const net          = gross * (1 - FENCING - PAVEL) + OFFICE_SAFE;
+
+      return {
+        primaryVal, secondaryVal, gross, net: Math.round(net), eliteBonus, bag,
+      };
+    }
+
+    // ── Clicks display helper ─────────────────────────────────────────────────
+    function clicksDisplay(key, unitsTaken, tables) {
+      if (unitsTaken === 0) return null;
+      const loot = LOOT_MAP[key];
+      const { units_per_table, max_clicks, pickup_units } = loot;
+
+      if (max_clicks === 1) {
+        const count = Math.round(unitsTaken / units_per_table);
+        return count === tables ? `${count}개 전체` : `${count}개`;
+      }
+
+      const fullTables   = Math.floor(unitsTaken / units_per_table);
+      const partialUnits = unitsTaken % units_per_table;
+
+      let partialClicks = null;
+      if (partialUnits > 0) {
+        for (let i = 0; i < pickup_units.length; i++) {
+          if (pickup_units[i] >= partialUnits) { partialClicks = i + 1; break; }
+        }
+        if (partialClicks === null) partialClicks = pickup_units.length;
+      }
+
+      if (fullTables > 0 && partialClicks !== null) {
+        return `${max_clicks}클릭×${fullTables} + ${partialClicks}클릭`;
+      } else if (fullTables > 0) {
+        return fullTables > 1 ? `${max_clicks}클릭×${fullTables}` : `${max_clicks}클릭`;
+      } else {
+        return `${partialClicks}클릭`;
+      }
+    }
+
+    // ── Per-player loot assignment ────────────────────────────────────────────
+    function calcPlayerAssignments(bag, crewSize, bonusMult) {
+      const pool = {};
+      const cumulativeTaken = {};
+      for (const item of bag.items) {
+        if (item.units_taken > 0 && !item.profit_excluded) {
+          pool[item.key] = item.units_taken;
+          cumulativeTaken[item.key] = 0;
+        }
+      }
+      if (!Object.keys(pool).length) return [];
+
+      const lootOrder = Object.keys(pool).sort((a, b) => {
+        const vpcu = k => (LOOT_MAP[k].avg_value * bonusMult) / LOOT_MAP[k].units_per_table;
+        return vpcu(b) - vpcu(a);
+      });
+
+      const assignments = [];
+      for (let p = 0; p < crewSize; p++) {
+        const assignment = {};
+        let remaining = BAG_CAP;
+        for (const key of lootOrder) {
+          if (remaining <= 0) break;
+          const avail = pool[key] || 0;
+          if (!avail) continue;
+          const loot = LOOT_MAP[key];
+          let taken;
+          if (loot.max_clicks === 1) {
+            const fits = Math.floor(remaining / loot.units_per_table);
+            const has  = Math.floor(avail    / loot.units_per_table);
+            taken = Math.min(fits, has) * loot.units_per_table;
+          } else {
+            taken = Math.min(avail, remaining);
+          }
+          if (taken > 0) {
+            assignment[key] = { units: taken, previouslyTaken: cumulativeTaken[key] };
+            cumulativeTaken[key] += taken;
+            pool[key] -= taken;
+            remaining -= taken;
+          }
+        }
+        assignments.push(assignment);
+      }
+      return assignments;
+    }
+
+    function formatPlayerTask(key, unitInfo) {
+      const units     = typeof unitInfo === 'number' ? unitInfo : unitInfo.units;
+      const prevTaken = typeof unitInfo === 'number' ? 0 : (unitInfo.previouslyTaken || 0);
+      const loot      = LOOT_MAP[key];
+      const { units_per_table, max_clicks, pickup_units } = loot;
+
+      if (max_clicks === 1) {
+        const count = Math.round(units / units_per_table);
+        return `${loot.label} ${count}개`;
+      }
+
+      const fullTables   = Math.floor(units / units_per_table);
+      const partialUnits = units % units_per_table;
+
+      if (CLICK_DISPLAY_MODE === 'B') {
+        const tableCount = parseFloat((units / units_per_table).toFixed(2)).toString();
+        return `${loot.label}: ${tableCount}테이블`;
+      }
+
+      let partialClicks = null;
+      if (partialUnits > 0) {
+        const startOffset = prevTaken % units_per_table;
+        let startClicks = 0;
+        for (let i = 0; i < pickup_units.length; i++) {
+          if (pickup_units[i] <= startOffset) startClicks = i + 1;
+          else break;
+        }
+        const endUnits = startOffset + partialUnits;
+        let endClicks = pickup_units.length;
+        for (let i = 0; i < pickup_units.length; i++) {
+          if (pickup_units[i] >= endUnits) { endClicks = i + 1; break; }
+        }
+        partialClicks = endClicks - startClicks;
+      }
+
+      let clickStr;
+      if (fullTables > 0 && partialClicks !== null) {
+        clickStr = `${max_clicks}클릭×${fullTables} + ${partialClicks}클릭`;
+      } else if (fullTables > 0) {
+        clickStr = fullTables > 1 ? `${max_clicks}클릭×${fullTables}` : `${max_clicks}클릭`;
+      } else {
+        clickStr = `${partialClicks}클릭`;
+      }
+      return `${loot.label}: ${clickStr}`;
+    }
+
+    function renderPlayerTasks(r) {
+      const container = document.getElementById('player-tasks-content');
+      if (!r) {
+        container.innerHTML = '<p class="text-xs text-gray-600">조건을 입력하면 표시됩니다</p>';
+        return;
+      }
+      const hasLoot = r.bag.items.some(i => i.units_taken > 0 && !i.profit_excluded);
+      if (!hasLoot) {
+        container.innerHTML = '<p class="text-xs text-gray-600">보조 목표물이 없습니다</p>';
+        return;
+      }
+
+      container.innerHTML = '';
+      document.getElementById('player-tasks-title').textContent =
+        CLICK_DISPLAY_MODE === 'A' ? '팀 수거 계획' : '플레이어별 수거 계획';
+
+      if (CLICK_DISPLAY_MODE === 'A') {
+        for (const item of r.bag.items) {
+          if (item.units_taken === 0 || item.profit_excluded) continue;
+          const loot = LOOT_MAP[item.key];
+          let display;
+          if (loot.max_clicks === 1) {
+            const count = Math.round(item.units_taken / loot.units_per_table);
+            display = `${item.label} ${count}개`;
+          } else {
+            const fullTables   = Math.floor(item.units_taken / loot.units_per_table);
+            const partialUnits = item.units_taken % loot.units_per_table;
+            let partialClicks  = 0;
+            if (partialUnits > 0) {
+              for (let i = 0; i < loot.pickup_units.length; i++) {
+                if (loot.pickup_units[i] >= partialUnits) { partialClicks = i + 1; break; }
+              }
+              if (partialClicks === 0) partialClicks = loot.max_clicks;
+            }
+            const totalClicks = fullTables * loot.max_clicks + partialClicks;
+            const tableCount  = parseFloat((item.units_taken / loot.units_per_table).toFixed(2)).toString();
+            display = `${item.label}: 팀 총 ${totalClicks}클릭 (${tableCount}테이블)`;
+          }
+          const row = document.createElement('div');
+          row.style.cssText = 'padding:0.4rem 0; border-bottom:1px solid #1f2937;';
+          row.innerHTML = `<span style="color:#d1d5db; font-size:0.875rem;">${display}</span>`;
+          container.appendChild(row);
+        }
+      } else {
+        const crew      = parseInt(document.querySelector('input[name="calc-crew"]:checked')?.value || '2');
+        const bonusMult = PRIMARY_MAP[document.getElementById('calc-primary').value]?.bonus_multiplier || 1.0;
+        const assignments = calcPlayerAssignments(r.bag, crew, bonusMult);
+
+        assignments.forEach((assignment, i) => {
+          const tasks = Object.keys(assignment)
+            .filter(key => assignment[key].units > 0)
+            .map(key => formatPlayerTask(key, assignment[key]));
+          const row = document.createElement('div');
+          row.style.cssText = 'display:flex; align-items:baseline; gap:0.75rem; padding:0.4rem 0; border-bottom:1px solid #1f2937;';
+          row.innerHTML =
+            `<span style="color:#6b7280; font-size:0.75rem; white-space:nowrap; flex-shrink:0;">플레이어 ${i + 1}</span>` +
+            `<span style="color:#d1d5db; font-size:0.875rem;">${
+              tasks.length
+                ? tasks.join('<span style="color:#4b5563; margin:0 0.25rem;">+</span>')
+                : '—'
+            }</span>`;
+          container.appendChild(row);
+        });
+
+        if (CLICK_DISPLAY_MODE === 'C') {
+          const note = document.createElement('p');
+          note.style.cssText = 'font-size:0.7rem; color:#6b7280; margin-top:0.375rem;';
+          note.textContent = '* 테이블을 공유하는 경우 실제 클릭 수가 다를 수 있습니다';
+          container.appendChild(note);
+        }
+      }
+
+      const children = container.children;
+      if (children.length) children[children.length - 1].style.borderBottom = 'none';
+    }
+
+    function recalcAll() {
+      updateLootHints();
+      updatePrimaryHint();
+      const r = calcAll();
+      renderBagFullIndicator(r);
+      renderPlayerPayout(r);
+      renderDetailSection(r);
+    }
+
+    // ── Full Bag Possible indicator ───────────────────────────────────────────
+    function renderBagFullIndicator(r) {
+      const el    = document.getElementById('bag-full-indicator');
+      const label = document.getElementById('bag-full-yn');
+      if (!r) { el.style.display = 'none'; return; }
+
+      el.style.display = '';
+      if (r.bag.isFull) {
+        el.style.background   = '#052e16';
+        el.style.borderColor  = '#16a34a';
+        el.style.color        = '#86efac';
+        label.textContent     = '✓ 가능';
+      } else {
+        el.style.background   = '#1c1917';
+        el.style.borderColor  = '#78716c';
+        el.style.color        = '#a8a29e';
+        label.textContent     = '✗ 불가 (보조 목표물 부족)';
+      }
+    }
+
+    // ── Player payout panel ───────────────────────────────────────────────────
+    function renderPlayerPayout(r) {
+      const panel    = document.getElementById('calc-player-panel');
+      const eliteRow = document.getElementById('calc-elite-row');
+
+      if (!r) {
+        panel.innerHTML = '<p class="text-xs text-gray-600">주요 목표물을 선택하면 표시됩니다</p>';
+        eliteRow.classList.add('hidden');
+        return;
+      }
+
+      const { net, eliteBonus } = r;
+      const isFull = r.bag.isFull;
+      const total  = cutValues.reduce((s, v) => s + v, 0);
+      panel.innerHTML = '';
+
+      cutValues.forEach((cut, i) => {
+        const base      = Math.round(net * cut / 100);
+        const withBonus = base + eliteBonus;
+        const row = document.createElement('div');
+        row.className = 'player-payout-row';
+        row.innerHTML =
+          `<span style="color:#9ca3af; font-size:0.875rem;">${PLAYER_LABELS[i]}<br>` +
+          `<span style="color:#4b5563; font-size:0.75rem;">${cut}%</span></span>` +
+          `<div style="text-align:right; line-height:1.2;">` +
+            (isFull ? `<div style="font-size:0.75rem; color:#6b7280;">${fmtMoney(base)}</div>` : '') +
+            `<div style="font-size:1.5rem; font-weight:700; color:#eab308;">${fmtMoney(isFull ? withBonus : base)}</div>` +
+          `</div>`;
+        panel.appendChild(row);
+      });
+
+      if (total !== 100) {
+        const warn = document.createElement('p');
+        warn.className = 'text-xs text-yellow-500 mt-1';
+        warn.textContent = '합계가 100%가 아닙니다';
+        panel.appendChild(warn);
+      }
+
+      if (isFull) {
+        eliteRow.classList.remove('hidden');
+        document.getElementById('calc-elite-val').textContent = '+' + fmtMoney(eliteBonus);
+      } else {
+        eliteRow.classList.add('hidden');
+      }
+    }
+
+    // ── Detail section ────────────────────────────────────────────────────────
+    function renderDetailSection(r) {
+      const placeholder = document.getElementById('bag-placeholder');
+      const bagTable    = document.getElementById('bag-table');
+      const bagBarWrap  = document.getElementById('bag-bar-wrap-outer');
+      const summaryEl   = document.getElementById('payout-summary');
+      const orderNote   = document.getElementById('bag-order-note');
+
+      if (!r) {
+        placeholder.classList.remove('hidden');
+        bagTable.classList.add('hidden');
+        bagBarWrap.classList.add('hidden');
+        orderNote.classList.add('hidden');
+        summaryEl.innerHTML = '<p class="text-xs text-gray-600">주요 목표물을 선택하면 표시됩니다</p>';
+        renderPlayerTasks(null);
+        return;
+      }
+
+      placeholder.classList.add('hidden');
+      bagTable.classList.remove('hidden');
+      bagBarWrap.classList.remove('hidden');
+
+      const paintingsItem     = r.bag.items.find(i => i.key === '그림');
+      const paintingsTaken    = paintingsItem && paintingsItem.units_taken > 0;
+      const paintingsExcluded = paintingsItem && paintingsItem.profit_excluded;
+      const otherTaken        = r.bag.items.some(i => i.key !== '그림' && i.units_taken > 0);
+      const bwp = r.bag.bestWithPaintingsSecondary;
+      if (paintingsExcluded && otherTaken &&
+          bwp !== null && r.secondaryVal < bwp && bwp < r.secondaryVal + r.eliteBonus) {
+        orderNote.textContent = '그림은 수익 최적화로 제외되었습니다 — 다른 목표물로 가방을 채우는 것이 더 유리합니다';
+        orderNote.classList.remove('hidden');
+      } else if (paintingsTaken && otherTaken) {
+        orderNote.textContent = '저택 내부에서는 그림을 먼저 수집한 후, 나머지 공간을 다른 목표물(금/현금)로 채우세요';
+        orderNote.classList.remove('hidden');
+      } else {
+        orderNote.classList.add('hidden');
+      }
+
+      const tbody = document.getElementById('bag-tbody');
+      tbody.innerHTML = '';
+      r.bag.items.forEach(item => {
+        const tr = document.createElement('tr');
+        const notCollected = item.skipped || item.units_taken === 0;
+        if (notCollected) tr.className = 'skipped';
+        let clicksText;
+        if (item.profit_excluded) {
+          clicksText = '<span style="font-size:0.75rem;color:#92400e;">수익 최적화로 제외</span>';
+        } else if (item.skipped) {
+          clicksText = '<span style="font-size:0.75rem;color:#4b5563;">가방 가득 참</span>';
+        } else if (item.units_taken === 0) {
+          clicksText = '<span style="font-size:0.75rem;color:#4b5563;">—</span>';
+        } else {
+          clicksText = clicksDisplay(item.key, item.units_taken, item.tables);
+        }
+        tr.innerHTML =
+          `<td>${item.label}</td>` +
+          `<td style="text-align:right;">${item.tables}</td>` +
+          `<td style="text-align:right;">${clicksText}</td>` +
+          `<td style="text-align:right;">${notCollected ? '—' : fmtMoney(item.value)}</td>`;
+        tbody.appendChild(tr);
+      });
+
+      const fillPct = Math.min(100, (r.bag.totalTaken / r.bag.capacity) * 100);
+      const bar = document.getElementById('bag-bar');
+      bar.style.width = fillPct + '%';
+      bar.className = 'bag-bar-fill' + (r.bag.isFull ? ' full' : '');
+      document.getElementById('bag-fill-label').textContent =
+        `${r.bag.totalTaken.toLocaleString()} / ${r.bag.capacity.toLocaleString()} 유닛`;
+
+      const statusMsg = document.getElementById('bag-status-msg');
+      if (r.bag.isFull) {
+        statusMsg.textContent = '✓ 가방이 가득 찼습니다 — 엘리트 조건 충족 가능';
+        statusMsg.className = 'text-xs mt-1 text-green-400';
+      } else {
+        const leftover = r.bag.capacity - r.bag.totalTaken;
+        statusMsg.textContent = `⚠ 가방 여유 ${leftover.toLocaleString()} 유닛 — 보조 목표물이 더 있으면 추가 수익 가능`;
+        statusMsg.className = 'text-xs mt-1 text-yellow-500';
+      }
+
+      summaryEl.innerHTML = '';
+      const summaryRows = [
+        { label: '주요 목표물',                                         value: fmtMoney(r.primaryVal) },
+        { label: '보조 합계',                                           value: fmtMoney(r.secondaryVal) },
+        { label: '순 수익 (수수료 12% 제외 + 사무실 금고 평균 $59.5k)', value: fmtMoney(r.net), gold: true },
+      ];
+      if (r.bag.isFull) {
+        summaryRows.push({ label: '엘리트 보상 (1인당)', value: '+' + fmtMoney(r.eliteBonus) });
+      }
+      summaryRows.forEach(row => {
+        const div = document.createElement('div');
+        div.className = 'payout-row';
+        div.innerHTML =
+          `<span class="label">${row.label}</span>` +
+          `<span class="value${row.gold ? ' gold' : ''}">${row.value}</span>`;
+        summaryEl.appendChild(div);
+      });
+
+      renderPlayerTasks(r);
+    }
+
+    // ── Detail collapsible toggle ─────────────────────────────────────────────
+    document.getElementById('detail-toggle').addEventListener('click', () => {
+      const body = document.getElementById('detail-body');
+      const icon = document.getElementById('detail-icon');
+      body.classList.toggle('hidden');
+      icon.classList.toggle('rotate-180');
+    });
+
+    // ── Primary target value hint ─────────────────────────────────────────────
+    function updatePrimaryHint() {
+      const key = document.getElementById('calc-primary').value;
+      const el  = document.getElementById('primary-value-hint');
+      if (!key || !PRIMARY_MAP[key]) { el.textContent = ''; return; }
+      const t = PRIMARY_MAP[key];
+      const bonus = Math.round((t.bonus_multiplier - 1) * 100);
+      const bonusPart = `보조 +${bonus}%`;
+      if (t.hard !== t.standard) {
+        el.textContent = `보통 $${t.standard.toLocaleString()}  ·  어려움 $${t.hard.toLocaleString()}  ·  ${bonusPart}`;
+      } else {
+        el.textContent = `$${t.standard.toLocaleString()}  ·  ${bonusPart}`;
+      }
+    }
+
+    // ── Hard mode availability ────────────────────────────────────────────────
+    function updateHardAvailability() {
+      const target    = document.getElementById('calc-primary').value;
+      const hardRadio = document.querySelector('input[name="calc-difficulty"][value="hard"]');
+      const hardLabel = hardRadio?.closest('label');
+      if (target === 'madrazo_file') {
+        hardRadio.disabled = true;
+        if (hardLabel) hardLabel.style.opacity = '0.35';
+        if (hardRadio.checked) {
+          hardRadio.checked = false;
+          document.querySelector('input[name="calc-difficulty"][value="normal"]').checked = true;
+        }
+      } else {
+        hardRadio.disabled = false;
+        if (hardLabel) hardLabel.style.opacity = '';
+      }
+    }
+
+    // ── Global input listeners ────────────────────────────────────────────────
+    document.getElementById('calc-primary').addEventListener('change', () => {
+      updateHardAvailability();
+      recalcAll();
+    });
+    document.querySelectorAll('input[name="calc-difficulty"]').forEach(r => r.addEventListener('change', recalcAll));
+
+    // ── Init ──────────────────────────────────────────────────────────────────
+    LOOT_KEYS.forEach(refreshLootBtn);
+    renderCutWidget();
+    updateHardAvailability();
+    recalcAll();
+  </script>
+</body>
+</html>
